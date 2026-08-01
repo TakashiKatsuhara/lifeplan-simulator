@@ -17,15 +17,17 @@
 <meta property="og:image" content="https://katsuo-labs.github.io/lifeplan-simulator/ogp.png">
 <style>
   :root {
-    --bg: #f4f6f9;
+    --bg: #f6f7f9;
     --card: #ffffff;
-    --text: #1a2433;
-    --sub: #6b7a90;
+    --text: #0f172a;
+    --sub: #64748b;
+    --faint: #94a3b8;
     --accent: #2563eb;
     --accent-light: #dbeafe;
     --green: #059669;
     --orange: #ea580c;
     --red: #dc2626;
+    --line: #eef2f6;
     --border: #e2e8f0;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -33,296 +35,221 @@
     font-family: "Hiragino Sans", "Yu Gothic UI", "Meiryo", sans-serif;
     background: var(--bg);
     color: var(--text);
-    padding: 24px;
-    line-height: 1.6;
+    padding: 28px 24px;
+    line-height: 1.65;
   }
-  h1 { font-size: 22px; margin-bottom: 4px; }
-  .subtitle { color: var(--sub); font-size: 13px; margin-bottom: 20px; }
-  .page-head {
-    max-width: 1360px;
-    margin: 0 auto 18px;
-    background: linear-gradient(135deg, #1e3a8a, #2563eb);
-    border-radius: 14px;
-    padding: 18px 24px;
-    color: #fff;
-    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
-  }
-  .page-head h1 { color: #fff; }
-  .page-head .subtitle { color: rgba(255, 255, 255, 0.88); margin-bottom: 0; }
-  .page-head .age-badge { background: rgba(255, 255, 255, 0.22); color: #fff; }
-  @media (max-width: 700px) {
-    body { padding: 12px; }
-    .page-head { padding: 14px 16px; border-radius: 12px; }
-    h1 { font-size: 19px; }
-  }
-  .layout {
-    display: grid;
-    grid-template-columns: 430px 1fr;
-    gap: 20px;
-    max-width: 1360px;
-    margin: 0 auto;
-  }
-  .layout.setup { grid-template-columns: 1fr 1fr; align-items: start; }
-  @media (max-width: 980px) { .layout, .layout.setup { grid-template-columns: 1fr; } }
-  .tabs { display: flex; gap: 6px; max-width: 1360px; margin: 0 auto 18px; flex-wrap: wrap; }
-  .tab-btn {
-    padding: 8px 18px;
-    border: 1px solid var(--border);
-    background: #fff;
-    border-radius: 999px;
-    cursor: pointer;
-    font-size: 13px;
-    color: var(--sub);
-  }
-  .tab-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .tab-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: bold; }
-  .tab-page { display: none; }
-  .tab-page.active { display: block; }
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 20px;
-  }
-  .card h2 {
-    font-size: 15px;
-    margin-bottom: 14px;
-    padding-bottom: 8px;
-    border-bottom: 2px solid var(--accent-light);
-  }
-  .set-head { font-size: 13px; font-weight: bold; margin: 14px 0 2px; }
-  .set-head:first-of-type { margin-top: 0; }
-  .set-desc { font-size: 11px; color: var(--sub); margin: 0 0 6px; }
-  .intro-banner {
-    max-width: 1360px;
-    margin: 0 auto 18px;
-    padding: 14px 18px;
-    background: #eff6ff;
-    border: 1px solid #bfdbfe;
-    border-radius: 12px;
-    font-size: 13px;
-    display: flex;
-    justify-content: space-between;
-    gap: 16px;
-    align-items: flex-start;
-  }
-  .intro-banner { flex-wrap: wrap; }
-  .intro-banner ol { margin: 4px 0 0 20px; }
-  .intro-banner .close {
-    background: #fff;
-    border: 1px solid var(--accent);
-    color: var(--accent);
-    border-radius: 8px;
-    padding: 6px 14px;
-    cursor: pointer;
-    font-size: 12px;
-    white-space: nowrap;
-  }
-  .intro-banner .close:hover { background: var(--accent); color: #fff; }
-  label { font-size: 11px; color: var(--sub); display: block; margin-bottom: 2px; }
-  input[type="number"], input[type="text"], select {
-    width: 100%;
-    padding: 6px 8px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 14px;
-    background: #fff;
-    color: var(--text);
-  }
-  input:focus, select:focus { outline: 2px solid var(--accent-light); border-color: var(--accent); }
-  .row { display: flex; gap: 10px; margin-bottom: 12px; }
-  .row > div {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;   /* ラベルが2行になっても入力欄は下端で横並びに揃える */
-  }
+  h1 { font-size: 20px; font-weight: 700; letter-spacing: .01em; }
+  .subtitle { color: var(--sub); font-size: 12.5px; margin-top: 2px; }
+  .page-head { max-width: 1360px; margin: 0 auto 22px; display: flex; align-items: flex-start; gap: 14px; }
+  .page-head .logo { flex: 0 0 auto; border-radius: 11px; box-shadow: 0 2px 8px rgba(37,99,235,.28); }
   .age-badge {
     display: inline-block;
-    background: var(--accent-light);
+    background: #eff6ff;
     color: var(--accent);
-    font-size: 12px;
-    font-weight: bold;
+    font-size: 11.5px;
+    font-weight: 600;
     padding: 2px 10px;
     border-radius: 999px;
-    margin-left: 8px;
-    vertical-align: middle;
+    margin-left: 10px;
+    vertical-align: 2px;
   }
-  .phase {
-    margin-bottom: 8px;
-    padding: 8px 10px;
-    background: #f8fafc;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-  }
-  .phase .phase-inputs { display: flex; gap: 6px; align-items: flex-end; margin-bottom: 4px; }
-  .phase .num {
-    font-size: 12px;
-    color: var(--accent);
-    font-weight: bold;
-    padding-bottom: 7px;
-    min-width: 16px;
-  }
-  .phase .phase-inputs > div { flex: 1; min-width: 0; }
-  .phase .phase-inputs > div:not(.kind-btns) {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;   /* ラベルの行数に関わらず入力欄を下端で揃える */
-  }
-  .phase button {
-    background: none;
+  .tabs-wrap { max-width: 1360px; margin: 0 auto 20px; }
+  .tabs { display: inline-flex; background: #e8ecf1; padding: 4px; border-radius: 12px; gap: 2px; flex-wrap: wrap; }
+  .tab-btn {
     border: none;
-    color: var(--red);
+    background: transparent;
+    padding: 8px 20px;
+    border-radius: 9px;
+    color: var(--sub);
+    font-size: 13px;
+    font-weight: 600;
     cursor: pointer;
-    font-size: 15px;
-    padding: 4px;
   }
-  .phase .caption { font-size: 11px; color: var(--sub); padding-left: 22px; }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { background: #fff; color: var(--text); box-shadow: 0 1px 3px rgba(15,23,42,.1); }
+  .tab-page { display: none; }
+  .tab-page.active { display: block; }
+  .layout { display: grid; grid-template-columns: 430px 1fr; gap: 20px; max-width: 1360px; margin: 0 auto; }
+  .layout.setup { grid-template-columns: 1fr 1fr; align-items: start; }
+  .card {
+    background: var(--card);
+    border: 1px solid rgba(15,23,42,.05);
+    border-radius: 16px;
+    padding: 22px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 2px rgba(15,23,42,.04);
+  }
+  .card h2 { font-size: 14px; font-weight: 700; margin-bottom: 14px; }
+  .set-head { font-size: 13px; font-weight: 700; margin: 16px 0 2px; }
+  .set-head:first-of-type { margin-top: 0; }
+  .set-desc { font-size: 11px; color: var(--sub); margin: 0 0 8px; }
+  label { font-size: 11px; color: var(--sub); display: block; margin-bottom: 3px; }
+  input[type="number"], input[type="text"], select {
+    width: 100%;
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 13.5px;
+    background: #fff;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+  input:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,.12); }
+  .row { display: flex; gap: 10px; margin-bottom: 12px; }
+  .row > div { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; }
+  .phase { margin-bottom: 10px; padding: 12px; background: #f8fafc; border-radius: 12px; }
+  .phase .phase-inputs { display: flex; gap: 8px; align-items: flex-end; margin-bottom: 6px; }
+  .phase .num { font-size: 11px; color: var(--faint); font-weight: 700; padding-bottom: 8px; min-width: 16px; }
+  .phase .phase-inputs > div { flex: 1; min-width: 0; }
+  .phase .phase-inputs > div:not(.kind-btns) { display: flex; flex-direction: column; justify-content: flex-end; }
+  .phase button { background: none; border: none; color: #cbd5e1; cursor: pointer; font-size: 14px; padding: 4px; }
+  .phase button:hover { color: var(--red); }
+  .phase .caption { font-size: 11px; color: var(--sub); padding-left: 24px; }
   .phase .caption .warn { color: var(--red); }
   .kind-btns { display: flex; gap: 4px; flex-wrap: wrap; flex: 1; }
   .kind-btn {
-    flex: 1 1 40%;   /* 常に2列×2行のグリッドに */
-    padding: 5px 4px;
+    flex: 1 1 40%;
+    padding: 6px 4px;
     font-size: 11px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
+    border: 1px solid transparent;
+    border-radius: 9px;
     background: #fff;
     color: var(--sub);
     cursor: pointer;
     text-align: center;
     white-space: nowrap;
+    box-shadow: 0 1px 2px rgba(15,23,42,.05);
   }
-  .kind-btn:hover { border-color: #94a3b8; }
-  .kind-btn.sel { font-weight: bold; }
+  .kind-btn:hover { color: var(--text); }
+  .kind-btn.sel { font-weight: 700; }
   .btn-add {
     width: 100%;
-    padding: 6px;
-    background: var(--accent-light);
+    padding: 8px;
+    background: #eff6ff;
     color: var(--accent);
-    border: 1px dashed var(--accent);
-    border-radius: 8px;
+    border: none;
+    border-radius: 10px;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 12.5px;
+    font-weight: 600;
   }
-  .btn-add:hover { background: #bfdbfe; }
+  .btn-add:hover { background: var(--accent-light); }
   .btn-save {
     width: 100%;
-    padding: 9px;
+    padding: 10px;
     background: var(--accent);
     color: #fff;
     border: none;
-    border-radius: 8px;
+    border-radius: 12px;
     cursor: pointer;
     font-size: 13px;
-    font-weight: bold;
+    font-weight: 700;
     margin-bottom: 12px;
   }
   .btn-save:hover { background: #1d4ed8; }
   .btn-reset {
-    padding: 6px 12px;
-    background: none;
+    padding: 6px 14px;
+    background: #fff;
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: 10px;
     color: var(--sub);
     cursor: pointer;
     font-size: 12px;
     white-space: nowrap;
   }
-  .btn-reset:hover { border-color: var(--red); color: var(--red); }
-  .timeline { display: flex; gap: 6px; align-items: stretch; }
-  .tl-card {
-    flex: 1;
-    min-width: 0;
-    padding: 14px;
-    border-radius: 10px;
+  .btn-reset:hover { color: var(--text); border-color: #cbd5e1; }
+  .intro-banner {
+    max-width: 1360px;
+    margin: 0 auto 20px;
+    padding: 16px 20px;
+    background: #fff;
+    border: 1px solid rgba(15,23,42,.05);
+    border-radius: 16px;
+    font-size: 13px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: flex-start;
+    box-shadow: 0 1px 2px rgba(15,23,42,.04);
+  }
+  .intro-banner ol { margin: 4px 0 0 20px; }
+  .intro-banner .close {
+    background: #fff;
     border: 1px solid var(--border);
-    background: #f8fafc;
+    color: var(--sub);
+    border-radius: 9px;
+    padding: 6px 14px;
+    cursor: pointer;
+    font-size: 12px;
   }
-  .tl-card .tag {
-    display: inline-block;
-    font-size: 11px;
-    font-weight: bold;
-    padding: 1px 10px;
-    border-radius: 999px;
-    margin-bottom: 4px;
-  }
-  .tl-card .when { font-size: 12px; color: var(--sub); }
-  .tl-card .big { font-size: 20px; font-weight: bold; margin: 2px 0 8px; }
-  .tl-card.green { background: #ecfdf5; border-color: #a7f3d0; }
-  .tl-card.green .tag { background: #d1fae5; color: var(--green); }
-  .tl-card.green .big { color: var(--green); }
-  .tl-card.blue { background: #eff6ff; border-color: #bfdbfe; }
-  .tl-card.blue .tag { background: var(--accent-light); color: var(--accent); }
-  .tl-card.blue .big { color: var(--accent); }
-  .tl-card.orange { background: #fff7ed; border-color: #fed7aa; }
-  .tl-card.orange .tag { background: #ffedd5; color: var(--orange); }
-  .tl-card.orange .big { color: var(--orange); }
+  .intro-banner .close:hover { color: var(--text); }
+  .timeline { display: flex; gap: 8px; align-items: stretch; }
+  .tl-card { flex: 1; min-width: 0; padding: 16px; border-radius: 14px; border: 1px solid rgba(15,23,42,.06); background: #fff; }
+  .tl-card .tag { display: inline-block; font-size: 10.5px; font-weight: 700; padding: 2px 10px; border-radius: 999px; margin-bottom: 6px; }
+  .tl-card .when { font-size: 11.5px; color: var(--sub); }
+  .tl-card .big { font-size: 22px; font-weight: 800; margin: 2px 0 10px; letter-spacing: .01em; font-variant-numeric: tabular-nums; }
+  .tl-card.green .tag { background: #ecfdf5; color: var(--green); }
+  .tl-card.blue .tag { background: #eff6ff; color: var(--accent); }
+  .tl-card.orange .tag { background: #fff7ed; color: var(--orange); }
   .tl-card.red { background: #fef2f2; border-color: #fecaca; }
   .tl-card.red .tag { background: #fee2e2; color: var(--red); }
   .tl-card.red .big { color: var(--red); }
-  .tl-row {
-    display: flex;
-    justify-content: space-between;
-    gap: 8px;
-    font-size: 12px;
-    color: var(--sub);
-    border-top: 1px dashed var(--border);
-    padding: 3px 0;
-  }
-  .tl-row b { color: var(--text); font-weight: 600; white-space: nowrap; }
-  .tl-arrow { align-self: center; color: #94a3b8; font-size: 16px; flex: 0 0 auto; }
-  @media (max-width: 980px) {
-    .timeline { flex-direction: column; }
-    .tl-arrow { transform: rotate(90deg); text-align: center; }
-  }
+  .tl-row { display: flex; justify-content: space-between; gap: 8px; font-size: 11.5px; color: var(--sub); border-top: 1px solid var(--line); padding: 4px 0; }
+  .tl-row b { color: var(--text); font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .tl-arrow { align-self: center; color: #d3dae3; font-size: 15px; flex: 0 0 auto; }
   canvas { width: 100%; height: 400px; display: block; }
-  .legend { display: flex; gap: 18px; font-size: 12px; color: var(--sub); margin-top: 8px; flex-wrap: wrap; }
-  .legend span.item { display: inline-flex; align-items: center; gap: 5px; }
-  .dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; vertical-align: middle; }
-  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
-  th, td { padding: 5px 8px; text-align: right; border-bottom: 1px solid var(--border); white-space: nowrap; }
-  th { background: #f8fafc; color: var(--sub); font-weight: normal; position: sticky; top: 0; }
-  thead tr.grp-row th { font-size: 11px; text-align: center; background: #eef2f7; padding: 3px 8px; }
+  .legend { display: flex; gap: 8px; font-size: 11.5px; color: var(--sub); margin-top: 10px; flex-wrap: wrap; }
+  .legend span.item { display: inline-flex; align-items: center; gap: 6px; background: #f8fafc; padding: 3px 11px; border-radius: 999px; }
+  .dot { width: 9px; height: 9px; border-radius: 4px; display: inline-block; vertical-align: middle; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+  th, td { padding: 6px 9px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th { background: #fff; color: var(--faint); font-weight: 600; font-size: 11px; position: sticky; top: 0; }
+  thead tr.grp-row th { font-size: 10.5px; text-align: center; background: #f8fafc; padding: 4px 8px; }
   thead tr:nth-child(2) th { top: 25px; }
-  th.sep-l, td.sep-l { border-left: 2px solid var(--border); }
+  th.sep-l, td.sep-l { border-left: 1px solid var(--border); }
   td:first-child, th:first-child { text-align: left; }
-  .table-wrap { max-height: 440px; overflow: auto; }
+  tbody tr:hover td { background: #f8fafc; }
+  .table-wrap { max-height: 440px; overflow: auto; border-radius: 8px; }
   td.neg { color: var(--red); }
-  td.total { font-weight: bold; }
-  .note { font-size: 11px; color: var(--sub); margin-top: 10px; }
+  td.total { font-weight: 700; }
+  .note { font-size: 11px; color: var(--faint); margin-top: 10px; }
   .inline-note { font-size: 11px; color: var(--accent); }
-  .plan-name {
-    width: 130px;
-    padding: 3px 6px;
-    font-size: 13px;
-    border: 1px solid transparent;
-    border-radius: 6px;
-    background: transparent;
-    color: var(--text);
-  }
+  .plan-name { width: 130px; padding: 3px 6px; font-size: 12.5px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: var(--text); }
   .plan-name:hover, .plan-name:focus { border-color: var(--border); background: #fff; outline: none; }
-  .plan-del { background: none; border: none; color: var(--red); cursor: pointer; font-size: 14px; }
+  .plan-del { background: none; border: none; color: #cbd5e1; cursor: pointer; font-size: 13px; }
+  .plan-del:hover { color: var(--red); }
   .plan-apply {
-    background: none;
-    border: 1px solid var(--accent);
+    background: #fff;
+    border: 1px solid var(--border);
     color: var(--accent);
-    border-radius: 6px;
+    border-radius: 8px;
     padding: 2px 10px;
     font-size: 11px;
     cursor: pointer;
     margin-right: 6px;
   }
-  .plan-apply:hover { background: var(--accent); color: #fff; }
+  .plan-apply:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
   #planArea { overflow-x: auto; }
+  @media (max-width: 980px) {
+    .layout, .layout.setup { grid-template-columns: 1fr; }
+    .timeline { flex-direction: column; }
+    .tl-arrow { transform: rotate(90deg); text-align: center; }
+  }
+  @media (max-width: 700px) {
+    body { padding: 14px; }
+    h1 { font-size: 17px; }
+  }
+
 </style>
 </head>
 <body>
 
 <div class="page-head">
+  <svg class="logo" width="42" height="42" viewBox="0 0 512 512"><rect width="512" height="512" rx="110" fill="#2563eb"/><rect x="116" y="288" width="64" height="108" rx="32" fill="#ffffff" opacity="0.55"/><rect x="224" y="220" width="64" height="176" rx="32" fill="#ffffff" opacity="0.8"/><rect x="332" y="128" width="64" height="268" rx="32" fill="#ffffff"/></svg>
   <div>
-    <h1>🗺 ライフプラン・シミュレーター<span class="age-badge" id="ageBadge"></span></h1>
-    <p class="subtitle">「何歳までにいくら貯めて、いくら使うか」を設計します（金額はすべて万円、収支は年額で入力）。<br>手取り・使用額・投資はそれぞれ独立したタイミングで区切れます。設定と保存プランはこのブラウザに自動保存されます。</p>
+    <h1>ライフプラン・シミュレーター<span class="age-badge" id="ageBadge"></span></h1>
+    <p class="subtitle">「何歳までにいくら貯めて、いくら使うか」を設計する無料シミュレーター。手取り・使用額・投資は別々のタイミングで区切れます（金額は万円・収支は年額）。データはこのブラウザにのみ保存されます。</p>
   </div>
 </div>
 
@@ -330,19 +257,19 @@
   <div>
     <b>👋 はじめての方へ</b> — いま表示されているのは<b>サンプルの数字</b>です。ご自身の数字に書き換えると、あなたのライフプランが自動で計算されます。
     <ol>
-      <li>「⚙️ 前提条件」タブで<b>生まれ年月</b>と<b>現在の資産</b>を入力</li>
-      <li>「📝 プラン設計」タブで<b>手取り・生活費・投資額</b>を自分の数字に変更</li>
+      <li>「前提条件」タブで<b>生まれ年月</b>と<b>現在の資産</b>を入力</li>
+      <li>「プラン設計」タブで<b>手取り・生活費・投資額</b>を自分の数字に変更</li>
       <li>結果はその場で自動更新。入力データはこのブラウザにのみ保存されます</li>
     </ol>
   </div>
   <button class="close" onclick="dismissIntro()">閉じる</button>
 </div>
 
-<div class="tabs">
-  <button class="tab-btn" data-tab="setup" onclick="switchTab('setup')">⚙️ 前提条件</button>
-  <button class="tab-btn active" data-tab="plan" onclick="switchTab('plan')">📝 プラン設計</button>
-  <button class="tab-btn" data-tab="detail" onclick="switchTab('detail')">📋 年表・比較</button>
-</div>
+<div class="tabs-wrap"><div class="tabs">
+  <button class="tab-btn" data-tab="setup" onclick="switchTab('setup')">前提条件</button>
+  <button class="tab-btn active" data-tab="plan" onclick="switchTab('plan')">プラン設計</button>
+  <button class="tab-btn" data-tab="detail" onclick="switchTab('detail')">年表・比較</button>
+</div></div>
 
 <!-- ========== ① 前提条件 ========== -->
 <div class="tab-page" id="tab-setup">
@@ -1228,8 +1155,8 @@ function drawChart(r, curAbs, planResults) {
   const y = v => padT + plotH - (v / maxVal) * plotH;
 
   ctx.font = '11px sans-serif';
-  ctx.fillStyle = '#6b7a90';
-  ctx.strokeStyle = '#e2e8f0';
+  ctx.fillStyle = '#94a3b8';
+  ctx.strokeStyle = '#eef2f6';
   for (let i = 0; i <= 5; i++) {
     const v = (maxVal / 5) * i;
     ctx.beginPath();
@@ -1249,10 +1176,16 @@ function drawChart(r, curAbs, planResults) {
   }
 
   // 積み上げ（下から 現金 → インデックス → 高配当）
+  const bandFill = rgb => {
+    const g = ctx.createLinearGradient(0, padT, 0, padT + plotH);
+    g.addColorStop(0, `rgba(${rgb},0.55)`);
+    g.addColorStop(1, `rgba(${rgb},0.08)`);
+    return g;
+  };
   const layers = [
-    { get: p => clamp0(p.cash), fill: 'rgba(148,163,184,0.45)', stroke: '#94a3b8' },
-    { get: p => p.idx, fill: 'rgba(37,99,235,0.40)', stroke: '#2563eb' },
-    { get: p => p.div, fill: 'rgba(234,88,12,0.40)', stroke: '#ea580c' },
+    { get: p => clamp0(p.cash), fill: bandFill('148,163,184'), stroke: '#94a3b8' },
+    { get: p => p.idx, fill: bandFill('37,99,235'), stroke: '#2563eb' },
+    { get: p => p.div, fill: bandFill('234,88,12'), stroke: '#ea580c' },
   ];
   let below = r.pts.map(() => 0);
   for (const L of layers) {
@@ -1266,7 +1199,7 @@ function drawChart(r, curAbs, planResults) {
     ctx.beginPath();
     r.pts.forEach((p, i) => i === 0 ? ctx.moveTo(x(p.absM), y(tops[i])) : ctx.lineTo(x(p.absM), y(tops[i])));
     ctx.strokeStyle = L.stroke;
-    ctx.lineWidth = 1.5;
+    ctx.lineWidth = 2;
     ctx.stroke();
     below = tops;
   }
@@ -1288,7 +1221,7 @@ function drawChart(r, curAbs, planResults) {
     ctx.setLineDash([3, 5]);
     ctx.moveTo(x(b), padT);
     ctx.lineTo(x(b), padT + plotH);
-    ctx.strokeStyle = '#cbd5e1';
+    ctx.strokeStyle = '#e5eaf0';
     ctx.lineWidth = 1;
     ctx.stroke();
     ctx.setLineDash([]);
