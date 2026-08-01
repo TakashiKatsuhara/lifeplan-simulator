@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ライフプラン・シミュレーター｜積立・取り崩し・配当を月単位で無料シミュレーション</title>
+<meta name="description" content="手取り・生活費・インデックス投資・高配当株投資を年齢ごとに設定して、生涯の資産推移を月単位でシミュレーション。何歳までにいくら貯まるか、老後に資産が何歳まで持つかを無料で計算できます。入力データはブラウザ内にのみ保存されます。">
+<meta property="og:title" content="ライフプラン・シミュレーター">
+<meta property="og:description" content="積立・取り崩し・配当まで月単位で計算できる無料の資産形成シミュレーター。何歳までにいくら貯まるかをグラフと年表で確認。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://takashikatsuhara.github.io/lifeplan-simulator/">
+<link rel="canonical" href="https://takashikatsuhara.github.io/lifeplan-simulator/">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🗺</text></svg>">
+<style>
+  :root {
+    --bg: #f4f6f9;
+    --card: #ffffff;
+    --text: #1a2433;
+    --sub: #6b7a90;
+    --accent: #2563eb;
+    --accent-light: #dbeafe;
+    --green: #059669;
+    --orange: #ea580c;
+    --red: #dc2626;
+    --border: #e2e8f0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Hiragino Sans", "Yu Gothic UI", "Meiryo", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 24px;
+    line-height: 1.6;
+  }
+  h1 { font-size: 22px; margin-bottom: 4px; }
+  .subtitle { color: var(--sub); font-size: 13px; margin-bottom: 20px; }
+  .page-head {
+    max-width: 1360px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  @media (max-width: 700px) {
+    body { padding: 12px; }
+    .page-head { flex-direction: column; }
+    h1 { font-size: 19px; }
+  }
+  .layout {
+    display: grid;
+    grid-template-columns: 430px 1fr;
+    gap: 20px;
+    max-width: 1360px;
+    margin: 0 auto;
+  }
+  .layout.setup { grid-template-columns: 1fr 1fr; align-items: start; }
+  @media (max-width: 980px) { .layout, .layout.setup { grid-template-columns: 1fr; } }
+  .tabs { display: flex; gap: 6px; max-width: 1360px; margin: 0 auto 18px; flex-wrap: wrap; }
+  .tab-btn {
+    padding: 8px 18px;
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--sub);
+  }
+  .tab-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .tab-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: bold; }
+  .tab-page { display: none; }
+  .tab-page.active { display: block; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  .card h2 {
+    font-size: 15px;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--accent-light);
+  }
+  .set-head { font-size: 13px; font-weight: bold; margin: 14px 0 2px; }
+  .set-head:first-of-type { margin-top: 0; }
+  .set-desc { font-size: 11px; color: var(--sub); margin: 0 0 6px; }
+  .intro-banner {
+    max-width: 1360px;
+    margin: 0 auto 18px;
+    padding: 14px 18px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 12px;
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  .intro-banner { flex-wrap: wrap; }
+  .intro-banner ol { margin: 4px 0 0 20px; }
+  .intro-banner .close {
+    background: #fff;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    border-radius: 8px;
+    padding: 6px 14px;
+    cursor: pointer;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .intro-banner .close:hover { background: var(--accent); color: #fff; }
+  label { font-size: 11px; color: var(--sub); display: block; margin-bottom: 2px; }
+  input[type="number"], input[type="text"], select {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    background: #fff;
+    color: var(--text);
+  }
+  input:focus, select:focus { outline: 2px solid var(--accent-light); border-color: var(--accent); }
+  .row { display: flex; gap: 10px; margin-bottom: 12px; }
+  .row > div { flex: 1; }
+  .age-badge {
+    display: inline-block;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: bold;
+    padding: 2px 10px;
+    border-radius: 999px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .phase {
+    margin-bottom: 8px;
+    padding: 8px 10px;
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  .phase .phase-inputs { display: flex; gap: 6px; align-items: flex-end; margin-bottom: 4px; }
+  .phase .num {
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: bold;
+    padding-bottom: 7px;
+    min-width: 16px;
+  }
+  .phase .phase-inputs > div { flex: 1; min-width: 0; }
+  .phase button {
+    background: none;
+    border: none;
+    color: var(--red);
+    cursor: pointer;
+    font-size: 15px;
+    padding: 4px;
+  }
+  .phase .caption { font-size: 11px; color: var(--sub); padding-left: 22px; }
+  .phase .caption .warn { color: var(--red); }
+  .kind-btns { display: flex; gap: 4px; flex-wrap: wrap; flex: 1; }
+  .kind-btn {
+    flex: 1;
+    min-width: 86px;
+    padding: 5px 4px;
+    font-size: 11px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--sub);
+    cursor: pointer;
+    text-align: center;
+    white-space: nowrap;
+  }
+  .kind-btn:hover { border-color: #94a3b8; }
+  .kind-btn.sel { font-weight: bold; }
+  .btn-add {
+    width: 100%;
+    padding: 6px;
+    background: var(--accent-light);
+    color: var(--accent);
+    border: 1px dashed var(--accent);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12px;
+  }
+  .btn-add:hover { background: #bfdbfe; }
+  .btn-save {
+    width: 100%;
+    padding: 9px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 12px;
+  }
+  .btn-save:hover { background: #1d4ed8; }
+  .btn-reset {
+    padding: 6px 12px;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--sub);
+    cursor: pointer;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .btn-reset:hover { border-color: var(--red); color: var(--red); }
+  .timeline { display: flex; gap: 6px; align-items: stretch; }
+  .tl-card {
+    flex: 1;
+    min-width: 0;
+    padding: 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: #f8fafc;
+  }
+  .tl-card .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 1px 10px;
+    border-radius: 999px;
+    margin-bottom: 4px;
+  }
+  .tl-card .when { font-size: 12px; color: var(--sub); }
+  .tl-card .big { font-size: 20px; font-weight: bold; margin: 2px 0 8px; }
+  .tl-card.green { background: #ecfdf5; border-color: #a7f3d0; }
+  .tl-card.green .tag { background: #d1fae5; color: var(--green); }
+  .tl-card.green .big { color: var(--green); }
+  .tl-card.blue { background: #eff6ff; border-color: #bfdbfe; }
+  .tl-card.blue .tag { background: var(--accent-light); color: var(--accent); }
+  .tl-card.blue .big { color: var(--accent); }
+  .tl-card.orange { background: #fff7ed; border-color: #fed7aa; }
+  .tl-card.orange .tag { background: #ffedd5; color: var(--orange); }
+  .tl-card.orange .big { color: var(--orange); }
+  .tl-card.red { background: #fef2f2; border-color: #fecaca; }
+  .tl-card.red .tag { background: #fee2e2; color: var(--red); }
+  .tl-card.red .big { color: var(--red); }
+  .tl-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--sub);
+    border-top: 1px dashed var(--border);
+    padding: 3px 0;
+  }
+  .tl-row b { color: var(--text); font-weight: 600; white-space: nowrap; }
+  .tl-arrow { align-self: center; color: #94a3b8; font-size: 16px; flex: 0 0 auto; }
+  @media (max-width: 980px) {
+    .timeline { flex-direction: column; }
+    .tl-arrow { transform: rotate(90deg); text-align: center; }
+  }
+  canvas { width: 100%; height: 400px; display: block; }
+  .legend { display: flex; gap: 18px; font-size: 12px; color: var(--sub); margin-top: 8px; flex-wrap: wrap; }
+  .legend span.item { display: inline-flex; align-items: center; gap: 5px; }
+  .dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; vertical-align: middle; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th, td { padding: 5px 8px; text-align: right; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  th { background: #f8fafc; color: var(--sub); font-weight: normal; position: sticky; top: 0; }
+  thead tr.grp-row th { font-size: 11px; text-align: center; background: #eef2f7; padding: 3px 8px; }
+  thead tr:nth-child(2) th { top: 25px; }
+  th.sep-l, td.sep-l { border-left: 2px solid var(--border); }
+  td:first-child, th:first-child { text-align: left; }
+  .table-wrap { max-height: 440px; overflow: auto; }
+  td.neg { color: var(--red); }
+  td.total { font-weight: bold; }
+  .note { font-size: 11px; color: var(--sub); margin-top: 10px; }
+  .inline-note { font-size: 11px; color: var(--accent); }
+  .plan-name {
+    width: 130px;
+    padding: 3px 6px;
+    font-size: 13px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text);
+  }
+  .plan-name:hover, .plan-name:focus { border-color: var(--border); background: #fff; outline: none; }
+  .plan-del { background: none; border: none; color: var(--red); cursor: pointer; font-size: 14px; }
+  .plan-apply {
+    background: none;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    border-radius: 6px;
+    padding: 2px 10px;
+    font-size: 11px;
+    cursor: pointer;
+    margin-right: 6px;
+  }
+  .plan-apply:hover { background: var(--accent); color: #fff; }
+  #planArea { overflow-x: auto; }
+</style>
+</head>
+<body>
+
+<div class="page-head">
+  <div>
+    <h1>🗺 ライフプラン・シミュレーター<span class="age-badge" id="ageBadge"></span></h1>
+    <p class="subtitle">「何歳までにいくら貯めて、いくら使うか」を設計します（金額はすべて万円、収支は年額で入力）。<br>手取り・使用額・投資はそれぞれ独立したタイミングで区切れます。設定と保存プランはこのブラウザに自動保存されます。</p>
+  </div>
+  <div style="display:flex; gap:6px;">
+    <button class="btn-reset" onclick="exportState()" title="設定とプランをJSONファイルに書き出して保存">💾 バックアップ</button>
+    <button class="btn-reset" onclick="importState()" title="バックアップしたJSONファイルから復元">📂 復元</button>
+    <button class="btn-reset" onclick="resetAll()" title="保存された設定とプランを消去して初期状態に戻す">🗑 リセット</button>
+  </div>
+</div>
+
+<div class="intro-banner" id="introBanner" style="display:none">
+  <div>
+    <b>👋 はじめての方へ</b> — いま表示されているのは<b>サンプルの数字</b>です。ご自身の数字に書き換えると、あなたのライフプランが自動で計算されます。
+    <ol>
+      <li>「⚙️ 前提条件」タブで<b>生まれ年月</b>と<b>現在の資産</b>を入力</li>
+      <li>「📝 プラン設計」タブで<b>手取り・生活費・投資額</b>を自分の数字に変更</li>
+      <li>結果はその場で自動更新。入力データはこのブラウザにのみ保存されます</li>
+    </ol>
+  </div>
+  <button class="close" onclick="dismissIntro()">閉じる</button>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn" data-tab="setup" onclick="switchTab('setup')">⚙️ 前提条件</button>
+  <button class="tab-btn active" data-tab="plan" onclick="switchTab('plan')">📝 プラン設計</button>
+  <button class="tab-btn" data-tab="detail" onclick="switchTab('detail')">📋 年表・比較</button>
+</div>
+
+<!-- ========== ① 前提条件 ========== -->
+<div class="tab-page" id="tab-setup">
+<div class="layout setup">
+    <div class="card">
+      <h2>基本設定</h2>
+      <div class="row">
+        <div>
+          <label>生まれ年</label>
+          <input type="number" id="birthYear" value="1990" min="1930" max="2020" step="1">
+        </div>
+        <div>
+          <label>生まれ月</label>
+          <input type="number" id="birthMonth" value="4" min="1" max="12" step="1">
+        </div>
+        <div>
+          <label>何歳まで表示</label>
+          <input type="number" id="endAge" value="95" min="40" max="120" step="1">
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>開始年齢（歳）</label>
+          <input type="number" id="startAge" value="35" min="0" max="100" step="1">
+        </div>
+        <div>
+          <label>開始月</label>
+          <input type="number" id="startMonth" value="4" min="1" max="12" step="1">
+        </div>
+        <div></div>
+      </div>
+      <p class="note" id="startNote" style="margin-top:0"></p>
+      <p class="note" style="margin-top:4px">「開始年齢・開始月」はシミュレーションの起点です。ふつうは<b>現在の年齢・今月</b>でOK。過去にすると「あの時から投資していたら」も試せます。</p>
+      <div class="row" style="margin-top:8px">
+        <div>
+          <label>現在のインデックス（万円）</label>
+          <input type="number" id="initIdx" value="500" min="0" step="10">
+        </div>
+        <div>
+          <label>現在の高配当株（万円）</label>
+          <input type="number" id="initDiv" value="200" min="0" step="10">
+        </div>
+        <div>
+          <label>現在の現金（万円）</label>
+          <input type="number" id="initCash" value="300" min="0" step="10">
+        </div>
+      </div>
+      <p class="note">開始時点で保有している資産を入力します。インデックス＝投資信託などの評価額、高配当株＝高配当株・ETFの評価額、現金＝預貯金の残高。持っていないものは0でOKです。</p>
+    </div>
+
+    <div class="card">
+      <h2>利回りの設定</h2>
+      <p class="note" style="margin:0 0 10px">💡 <b>迷ったら初期値のままでOK</b>です（インデックス＝年利5%、高配当株＝値上がり1.5%＋配当3.5%という一般的な想定にしてあります）。</p>
+      <div class="row">
+        <div style="flex:0.9"><label style="font-weight:bold; color:var(--accent)">📈 インデックス</label></div>
+        <div>
+          <label>年利（%）</label>
+          <input type="number" id="idxCap" value="5" min="-10" max="30" step="0.1">
+        </div>
+        <div></div>
+        <div></div>
+      </div>
+      <div class="row">
+        <div style="flex:0.9"><label style="font-weight:bold; color:var(--orange)">💰 高配当株</label></div>
+        <div>
+          <label>値上がり率（%/年）</label>
+          <input type="number" id="divCap" value="1.5" min="-10" max="30" step="0.1">
+        </div>
+        <div>
+          <label>配当利回り（%/年）</label>
+          <input type="number" id="divInc" value="3.5" min="0" max="15" step="0.1">
+        </div>
+        <div>
+          <label>配当の使いみち</label>
+          <select id="divIncMode">
+            <option value="reinvest">再投資する</option>
+            <option value="receive" selected>現金で受け取る</option>
+          </select>
+        </div>
+      </div>
+      <p class="note">インデックスの「年利」＝値上がり込みの年間リターン（分配金は出さず、すべて評価額の成長に反映される想定）。<br>高配当株は「値上がり率」（株価の上昇分）と「配当利回り」（1年でもらえる配当の割合。<b>税引後の手取り</b>で入力）に分けて設定します。</p>
+    </div>
+</div>
+</div>
+
+<!-- ========== ② プラン設計 ========== -->
+<div class="tab-page active" id="tab-plan">
+<div class="layout">
+  <!-- 左：プラン入力 -->
+  <div>
+    <div class="card">
+      <h2>収支・投資のフェーズ（年額で入力）</h2>
+      <div class="set-head" style="color:var(--green)">💼 手取り</div>
+      <p class="set-desc">税金・社会保険料を引いた後の、1年間の手取り収入（ボーナス込み）。昇給・転職・リタイアの予定に合わせてフェーズを分けます。</p>
+      <div id="incomePhases"></div>
+      <button class="btn-add" onclick="addSetPhase('income')">＋ 手取りフェーズを追加</button>
+
+      <div class="set-head" style="color:var(--red)">🛒 使用額（生活費）</div>
+      <p class="set-desc">1年間に使うお金の合計（住居費・食費・娯楽・保険など全部込み）。老後の生活費もここで設定します。</p>
+      <div id="spendPhases"></div>
+      <button class="btn-add" onclick="addSetPhase('spend')">＋ 使用額フェーズを追加</button>
+      <p class="note" id="spendGapWarn" style="display:none; color:var(--red); margin-top:4px"></p>
+
+      <div class="set-head" style="color:var(--accent)">📈 インデックス投資</div>
+      <p class="set-desc">投資信託などに1年間で積み立てる金額（例: 月5万円なら60）。</p>
+      <div id="idxPhases"></div>
+      <button class="btn-add" onclick="addSetPhase('idx')">＋ インデックス投資フェーズを追加</button>
+
+      <div class="set-head" style="color:var(--orange)">💰 高配当投資</div>
+      <p class="set-desc">高配当株・ETFを1年間で買い付ける金額。高配当投資をしない方は0のままでOKです。</p>
+      <div id="divpPhases"></div>
+      <button class="btn-add" onclick="addSetPhase('divp')">＋ 高配当投資フェーズを追加</button>
+
+      <p class="note">それぞれ独立したタイミング（〜◯歳の◯月まで）で区切れます。昇給は4月、積立変更は好きな月、と<b>バラバラの時期で管理できます</b>。各項目とも最後のフェーズ以降は0になります（手取りならリタイア、投資なら積立停止）。<br>毎月「手取り − 使用額 − 投資額」の残りが現金に積み上がります。</p>
+    </div>
+
+    <div class="card">
+      <h2>取り崩し設定</h2>
+      <div class="row">
+        <div style="flex:1.4">
+          <label>取り崩し方法</label>
+          <select id="wdMode">
+            <option value="none" selected>しない</option>
+            <option value="fixed">定額（毎年一定額）</option>
+            <option value="rate">定率（残高の一定割合/年）</option>
+          </select>
+        </div>
+        <div id="wdFixedRow">
+          <label>年間の取り崩し額（万円）</label>
+          <input type="number" id="wdAmount" value="180" min="0" step="10">
+        </div>
+        <div id="wdRateRow" style="display:none">
+          <label>年率（%）</label>
+          <input type="number" id="wdRate" value="4" min="0" max="20" step="0.1">
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>開始年齢（歳）</label>
+          <input type="number" id="wdStartAge" value="65" min="0" max="120" step="1">
+        </div>
+        <div>
+          <label>開始月</label>
+          <input type="number" id="wdStartMonth" value="4" min="1" max="12" step="1">
+        </div>
+        <div>
+          <label>現金の下限（万円）</label>
+          <input type="number" id="cashFloor" value="1000" min="0" step="100">
+        </div>
+      </div>
+      <p class="note inline-note" id="wdNote" style="margin-top:0"></p>
+      <p class="note">生活費などの支出は<b>まず現金から</b>支払われます。現金が下限（初期値1,000万円）を割り込む分からは<b>インデックスを自動売却</b>して補填し、インデックスが尽きたら<b>高配当を売却</b>します（現金は下限で維持されます）。すべて尽きると「資産が尽きる」警告が出ます。<br>定額・定率の取り崩しを設定した場合も、売却はインデックス→高配当の順で現金に入ります。定率を4%にすると、いわゆる「<b>4%ルール</b>」での取り崩しになります。</p>
+    </div>
+
+    <div class="card">
+      <h2>スポット項目（単発の収支）</h2>
+      <div id="spots"></div>
+      <button class="btn-add" onclick="addSpot()">＋ スポット項目を追加</button>
+      <p class="note">ボーナスでの一括投資、退職金、車の購入など、単発の大きな出入りを指定した年月に反映します。</p>
+    </div>
+  </div>
+
+  <!-- ========== 右：結果 ========== -->
+  <div>
+    <div class="card">
+      <h2>ライフプランの結果</h2>
+      <div id="summary"></div>
+    </div>
+
+    <div class="card">
+      <h2>資産推移（積み上げ）</h2>
+      <canvas id="chart"></canvas>
+      <div class="legend" id="legend"></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ========== ③ 年表・比較 ========== -->
+<div class="tab-page" id="tab-detail">
+  <div style="max-width:1360px; margin:0 auto;">
+    <div class="card">
+      <h2>プラン比較</h2>
+      <button class="btn-save" onclick="savePlan()">📌 現在のプランを保存して比較</button>
+      <div id="planArea"></div>
+    </div>
+
+    <div class="card">
+      <h2>ライフプラン年表</h2>
+      <div class="table-wrap">
+        <table id="table"></table>
+      </div>
+      <p class="note">※ 月次複利で計算。税金・手数料は考慮していません（利回りは税引後で入力してください）。<br>「<span class="dot" style="background:#ea580c"></span> 受取配当」＝<b>現金として受け取った高配当株の配当金</b>。「再投資する」を選んだ場合はここに載らず、資産残高の増加に反映されます。<br>各行は「<b>現金増減 ＝ 手取り − 使用額 − 投資へ ＋ 受取配当 ＋ 売却</b>」で検算できます。「売却」＝定額・定率の取り崩しと、現金下限を守るための自動売却の合計です。</p>
+    </div>
+  </div>
+</div>
+
+<footer style="max-width:1360px; margin:8px auto 0;">
+  <div class="card" style="font-size:12px; color:var(--sub); line-height:1.9;">
+    <h2>このツールについて</h2>
+    <p>ライフプラン・シミュレーターは、手取り収入・生活費・インデックス投資・高配当株投資を年齢や時期ごとに自由に設定し、生涯の資産推移を<b>月単位</b>で計算できる無料ツールです。積立シミュレーションだけでなく、老後の取り崩し（定額・定率・自動売却）、配当金・分配金の再投資／受け取り、現金とのバランスまでまとめて確認でき、「何歳までにいくら貯まるか」「資産は何歳まで持つか」をグラフと年表で把握できます。</p>
+    <h2 style="margin-top:18px">データの取り扱い</h2>
+    <p>入力されたデータは、お使いのブラウザ内（localStorage）にのみ保存されます。<b>サーバーへの送信・収集は一切行いません</b>。ブラウザのサイトデータを削除すると保存された設定・プランも消去されるため、画面右上の「💾 バックアップ」で設定一式をJSONファイルとして書き出しておくことをおすすめします（「📂 復元」でいつでも読み込めます）。</p>
+    <h2 style="margin-top:18px">免責事項</h2>
+    <p>本ツールは、シミュレーションによる情報提供のみを目的としており、特定の金融商品の推奨・勧誘や投資助言を行うものではありません。計算は簡易的なモデル（月次複利、税金・手数料は未考慮）に基づくものであり、実際の運用成果や将来の資産額を保証するものではありません。本ツールの利用により生じたいかなる損害についても、制作者は一切の責任を負いません。投資に関する最終的な判断は、ご自身の責任において行ってください。</p>
+  </div>
+</footer>
+
+<script>
+// ---- 状態 ----
+// フェーズセット: 手取り/使用額/インデックス投資/高配当投資 をそれぞれ独立に管理
+// 各エントリ: {endAge, endMonth, amount}（年額・万円）「〜◯歳の◯月まで」
+let phaseSets = {
+  income: [
+    { endAge: 45, endMonth: 4, amount: 500 },
+    { endAge: 65, endMonth: 4, amount: 550 },
+  ],
+  spend: [
+    { endAge: 65, endMonth: 4, amount: 300 },
+    { endAge: 95, endMonth: 4, amount: 330 },
+  ],
+  idx: [
+    { endAge: 55, endMonth: 4, amount: 120 },
+  ],
+  divp: [
+    { endAge: 60, endMonth: 4, amount: 36 },
+  ],
+};
+const SET_DEFS = {
+  income: { label: '手取り' },
+  spend: { label: '使用額' },
+  idx: { label: 'インデックス投資' },
+  divp: { label: '高配当投資' },
+};
+// スポット項目: kind 'idx' | 'div' | 'in' | 'out'
+let spots = [];
+let savedPlans = [];
+let planSeq = 0;
+let activeTab = 'plan';
+
+function applyTab() {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === activeTab));
+  document.querySelectorAll('.tab-page').forEach(p => p.classList.toggle('active', p.id === 'tab-' + activeTab));
+}
+function switchTab(t) {
+  activeTab = t;
+  applyTab();
+  simulate();   // 表示されたタブのキャンバスを正しい幅で描き直す
+}
+const PLAN_COLORS = ['#0ea5e9', '#8b5cf6', '#f59e0b', '#ec4899', '#10b981', '#64748b'];
+const SPOT_META = {
+  idx: { btn: '📈 インデックス', cap: 'インデックスへ一括投資', color: '#2563eb', bg: '#eff6ff' },
+  div: { btn: '💰 高配当', cap: '高配当へ一括投資', color: '#ea580c', bg: '#fff7ed' },
+  in:  { btn: '➕ 臨時収入', cap: '臨時収入（現金へ）', color: '#059669', bg: '#ecfdf5' },
+  out: { btn: '➖ 臨時支出', cap: '臨時支出（現金から）', color: '#dc2626', bg: '#fef2f2' },
+};
+
+// ---- 自動保存 ----
+const STORAGE_KEY = 'lifeplan-public-v1';
+const INPUT_IDS = ['birthYear', 'birthMonth', 'endAge', 'startAge', 'startMonth',
+                   'initIdx', 'initDiv', 'initCash',
+                   'idxCap', 'divCap', 'divInc', 'divIncMode',
+                   'wdMode', 'wdAmount', 'wdRate', 'wdStartAge', 'wdStartMonth', 'cashFloor'];
+
+// 旧形式（統合フェーズ表 lifePhases）→ 新形式への変換
+function legacyToSets(lifePhases) {
+  const mk = f => lifePhases.map(p => ({ endAge: p.endAge, endMonth: p.endMonth ?? 4, amount: p[f] || 0 }));
+  return { income: mk('income'), spend: mk('spend'), idx: mk('idx'), divp: mk('div') };
+}
+
+function saveState() {
+  try {
+    const inputs = {};
+    INPUT_IDS.forEach(id => inputs[id] = document.getElementById(id).value);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ inputs, phaseSets, spots, savedPlans, planSeq, activeTab, wdUnit: 'year' }));
+  } catch (e) {}
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const st = JSON.parse(raw);
+    if (st.inputs) INPUT_IDS.forEach(id => {
+      if (st.inputs[id] != null) document.getElementById(id).value = st.inputs[id];
+    });
+    // 旧データ移行: 取り崩し定額が月額だった時代の値を年額に換算
+    if (st.inputs && st.inputs.wdAmount != null && st.wdUnit !== 'year') {
+      document.getElementById('wdAmount').value = Math.round((+st.inputs.wdAmount || 0) * 12);
+    }
+    if (st.phaseSets && st.phaseSets.income) phaseSets = st.phaseSets;
+    else if (Array.isArray(st.lifePhases) && st.lifePhases.length) phaseSets = legacyToSets(st.lifePhases);
+    if (Array.isArray(st.spots)) spots = st.spots;
+    if (Array.isArray(st.savedPlans)) {
+      savedPlans = st.savedPlans.map(p => {
+        if (p.settings && !p.settings.phaseSets && Array.isArray(p.settings.lifePhases)) {
+          p.settings.phaseSets = legacyToSets(p.settings.lifePhases);
+        }
+        return p;
+      }).filter(p => p.settings && p.settings.phaseSets);
+    }
+    if (typeof st.planSeq === 'number') planSeq = st.planSeq;
+    if (typeof st.activeTab === 'string') activeTab = st.activeTab;
+  } catch (e) {}
+}
+
+function resetAll() {
+  if (!confirm('保存された設定とプランをすべて消去して、初期状態に戻します。よろしいですか？')) return;
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(STORAGE_KEY + '-intro');
+  } catch (e) {}
+  location.reload();
+}
+
+// ---- バックアップ / 復元 ----
+function exportState() {
+  saveState();
+  const raw = localStorage.getItem(STORAGE_KEY) || '{}';
+  const blob = new Blob([raw], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `lifeplan-backup-${calFromAbs(nowAbs()).year}-${calFromAbs(nowAbs()).month}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+function importState() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'application/json,.json';
+  input.onchange = () => {
+    const f = input.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        JSON.parse(reader.result);  // 形式チェック
+        localStorage.setItem(STORAGE_KEY, reader.result);
+        location.reload();
+      } catch (e) {
+        alert('ファイルを読み込めませんでした。「バックアップ」で保存したJSONファイルを選んでください。');
+      }
+    };
+    reader.readAsText(f);
+  };
+  input.click();
+}
+
+// ---- 初回案内バナー ----
+function dismissIntro() {
+  document.getElementById('introBanner').style.display = 'none';
+  try { localStorage.setItem(STORAGE_KEY + '-intro', 'dismissed'); } catch (e) {}
+}
+function showIntroIfNeeded() {
+  try {
+    if (localStorage.getItem(STORAGE_KEY + '-intro') !== 'dismissed') {
+      document.getElementById('introBanner').style.display = 'flex';
+    }
+  } catch (e) {}
+}
+
+// ---- 年月ユーティリティ ----
+function birthInfo() {
+  return {
+    by: +document.getElementById('birthYear').value || 1990,
+    bm: +document.getElementById('birthMonth').value || 1,
+  };
+}
+function absFromAgeCalMonth(age, calM) {
+  const { bm } = birthInfo();
+  return age * 12 + ((calM - bm + 12) % 12);
+}
+function calFromAbs(absM) {
+  const { by, bm } = birthInfo();
+  const t = (bm - 1) + absM;
+  return { year: by + Math.floor(t / 12), month: (t % 12) + 1 };
+}
+function ymStr(absM) {
+  const c = calFromAbs(absM);
+  return `${c.year}年${c.month}月`;
+}
+function ageStr(absM) {
+  return `${Math.floor(absM / 12)}歳`;
+}
+function nowAbs() {
+  const { by, bm } = birthInfo();
+  const now = new Date();
+  return (now.getFullYear() - by) * 12 + (now.getMonth() + 1 - bm);
+}
+function durStr(months) {
+  const y = Math.floor(months / 12), m = months % 12;
+  if (y > 0 && m > 0) return `${y}年${m}ヶ月`;
+  if (y > 0) return `${y}年`;
+  return `${m}ヶ月`;
+}
+function fmt(man) {
+  const v = Math.round(man);
+  if (Math.abs(v) >= 10000) {
+    const oku = Math.floor(Math.abs(v) / 10000);
+    const rest = Math.abs(v) % 10000;
+    const sign = v < 0 ? '-' : '';
+    return rest > 0 ? `${sign}${oku}億${rest.toLocaleString()}万円` : `${sign}${oku}億円`;
+  }
+  return `${v.toLocaleString()}万円`;
+}
+
+// ---- フェーズセット編集 ----
+function renderPhaseSet(key) {
+  const el = document.getElementById(key + 'Phases');
+  el.innerHTML = phaseSets[key].map((p, i) => `
+    <div class="phase">
+      <div class="phase-inputs">
+        <span class="num">${i + 1}</span>
+        <div style="flex:0.8">
+          <label>〜◯歳の</label>
+          <input type="number" value="${p.endAge}" min="0" max="120" step="1"
+            onchange="phaseSets.${key}[${i}].endAge = +this.value; simulate()">
+        </div>
+        <div style="flex:0.7">
+          <label>◯月まで</label>
+          <input type="number" value="${p.endMonth}" min="1" max="12" step="1"
+            onchange="phaseSets.${key}[${i}].endMonth = +this.value; simulate()">
+        </div>
+        <div>
+          <label>年額（万円）</label>
+          <input type="number" value="${p.amount}" min="0" step="10"
+            onchange="phaseSets.${key}[${i}].amount = +this.value; simulate()">
+        </div>
+        <button onclick="removeSetPhase('${key}', ${i})" title="削除">✕</button>
+      </div>
+      <div class="caption" id="${key}Cap${i}"></div>
+    </div>`).join('');
+}
+function renderAllPhaseSets() {
+  Object.keys(phaseSets).forEach(renderPhaseSet);
+}
+function addSetPhase(key) {
+  const arr = phaseSets[key];
+  const last = arr[arr.length - 1];
+  arr.push({
+    endAge: (last ? last.endAge : 60) + 5,
+    endMonth: last ? last.endMonth : 4,
+    amount: last ? last.amount : 100,
+  });
+  renderPhaseSet(key);
+  simulate();
+}
+function removeSetPhase(key, i) {
+  phaseSets[key].splice(i, 1);
+  renderPhaseSet(key);
+  simulate();
+}
+
+function updateSetCaptions(resolvedSets) {
+  for (const key of Object.keys(resolvedSets)) {
+    resolvedSets[key].forEach((p, i) => {
+      const el = document.getElementById(`${key}Cap${i}`);
+      if (!el) return;
+      if (p.months <= 0) {
+        el.innerHTML = `<span class="warn">⚠ 期間が0です（開始が${ymStr(p.startAbs)}のため、それより後を指定してください）</span>`;
+      } else {
+        el.textContent = `${ymStr(p.startAbs)} 〜 ${ymStr(p.endAbs)}（${durStr(p.months)}）: 年${p.amount.toLocaleString()}万円（月${(p.amount / 12).toFixed(1)}万円）`;
+      }
+    });
+  }
+}
+
+// ---- スポット項目 ----
+function renderSpots() {
+  const el = document.getElementById('spots');
+  el.innerHTML = spots.map((sp, i) => `
+    <div class="phase" style="border-left:3px solid ${SPOT_META[sp.kind].color}">
+      <div class="phase-inputs" style="align-items:center; margin-bottom:6px">
+        <span class="num">${i + 1}</span>
+        <div class="kind-btns">
+          ${Object.entries(SPOT_META).map(([k, m]) => `
+          <button class="kind-btn ${sp.kind === k ? 'sel' : ''}"
+            style="${sp.kind === k ? `background:${m.bg}; border-color:${m.color}; color:${m.color}` : ''}"
+            onclick="spots[${i}].kind = '${k}'; renderSpots(); simulate()">${m.btn}</button>`).join('')}
+        </div>
+        <button onclick="removeSpot(${i})" title="削除">✕</button>
+      </div>
+      <div class="phase-inputs" style="padding-left:22px">
+        <div>
+          <label>金額（万円）</label>
+          <input type="number" value="${sp.amount}" min="0" step="10"
+            onchange="spots[${i}].amount = +this.value; simulate()">
+        </div>
+        <div style="flex:0.8">
+          <label>年齢</label>
+          <input type="number" value="${sp.age}" min="0" max="120" step="1"
+            onchange="spots[${i}].age = +this.value; simulate()">
+        </div>
+        <div style="flex:0.7">
+          <label>月</label>
+          <input type="number" value="${sp.month}" min="1" max="12" step="1"
+            onchange="spots[${i}].month = +this.value; simulate()">
+        </div>
+      </div>
+      <div class="phase-inputs" style="padding-left:22px; margin-bottom:4px">
+        <div>
+          <label>メモ</label>
+          <input type="text" value="${(sp.memo || '').replace(/"/g, '&quot;')}" placeholder="例: 車の買い替え、退職金、ボーナス投資 など"
+            onchange="spots[${i}].memo = this.value; simulate()">
+        </div>
+      </div>
+      <div class="caption" id="spotCap${i}"></div>
+    </div>
+  `).join('');
+}
+
+function addSpot() {
+  const cur = nowAbs();
+  spots.push({ kind: 'idx', amount: 100, age: Math.floor(cur / 12), month: calFromAbs(cur).month, memo: '' });
+  renderSpots();
+  simulate();
+}
+
+function removeSpot(i) {
+  spots.splice(i, 1);
+  renderSpots();
+  simulate();
+}
+
+function updateSpotCaptions(startAbs, endAbs) {
+  spots.forEach((sp, i) => {
+    const el = document.getElementById(`spotCap${i}`);
+    if (!el) return;
+    const a = absFromAgeCalMonth(sp.age, sp.month);
+    if (a < startAbs || a >= endAbs) {
+      el.innerHTML = `<span class="warn">⚠ ${ymStr(a)} はシミュレーション期間外のため反映されません</span>`;
+    } else {
+      el.textContent = `${ymStr(a)}（${ageStr(a)}）に ${SPOT_META[sp.kind].cap} ${fmt(sp.amount)}${sp.memo ? `「${sp.memo}」` : ''}`;
+    }
+  });
+}
+
+// ---- 設定の読み取りと計算 ----
+function readSettings() {
+  const { by, bm } = birthInfo();
+  const g = id => +document.getElementById(id).value || 0;
+  const copySets = {};
+  for (const k of Object.keys(phaseSets)) copySets[k] = phaseSets[k].map(p => ({ ...p }));
+  return {
+    by, bm,
+    startAge: g('startAge'), startMonth: g('startMonth') || 1,
+    endAge: g('endAge') || 95,
+    initIdx: g('initIdx'), initDiv: g('initDiv'), initCash: g('initCash'),
+    idxCap: g('idxCap'), idxInc: 0, idxReinvest: true,  // インデックスは分配なし（年利に一本化）
+    divCap: g('divCap'), divInc: g('divInc'),
+    divReinvest: document.getElementById('divIncMode').value === 'reinvest',
+    wdMode: document.getElementById('wdMode').value,
+    wdAmount: g('wdAmount'), wdRate: g('wdRate'),
+    wdStartAge: g('wdStartAge'), wdStartMonth: g('wdStartMonth') || 1,
+    cashFloor: g('cashFloor'),
+    phaseSets: copySets,
+    spots: spots.map(sp => ({ ...sp })),
+  };
+}
+
+function amtAtSet(set, absM) {
+  for (const p of set) if (absM >= p.startAbs && absM < p.endAbs) return p.amount;
+  return 0;
+}
+
+function computePlan(s) {
+  const abs = (age, calM) => age * 12 + ((calM - s.bm + 12) % 12);
+  const startAbs = abs(s.startAge, s.startMonth);
+  const endAbs = s.endAge * 12;
+  const ps = s.phaseSets || legacyToSets(s.lifePhases || []);
+
+  // 各フェーズセットを絶対月に解決（それぞれ独立に、開始年月から連続）
+  const resolveSet = arr => {
+    let cursor = startAbs;
+    return arr.map(p => {
+      const e = Math.max(cursor, abs(p.endAge, p.endMonth || s.startMonth));
+      const r = { ...p, startAbs: cursor, endAbs: e, months: e - cursor };
+      cursor = e;
+      return r;
+    });
+  };
+  const sets = {};
+  for (const k of Object.keys(ps)) sets[k] = resolveSet(ps[k]);
+
+  // スポット項目
+  const spotMap = {};
+  for (const sp of s.spots || []) {
+    const a = abs(sp.age, sp.month);
+    const e = spotMap[a] = spotMap[a] || { idx: 0, div: 0, cash: 0 };
+    if (sp.kind === 'idx') e.idx += sp.amount;
+    else if (sp.kind === 'div') e.div += sp.amount;
+    else if (sp.kind === 'in') e.cash += sp.amount;
+    else e.cash -= sp.amount;
+  }
+
+  const gIdx = Math.pow(1 + s.idxCap / 100, 1 / 12) - 1;
+  const gDiv = Math.pow(1 + s.divCap / 100, 1 / 12) - 1;
+  const wdMode = s.wdMode || 'none';
+  const wdStartAbs = abs(s.wdStartAge || 65, s.wdStartMonth || s.startMonth);
+
+  let idx = s.initIdx, div = s.initDiv, cash = s.initCash;
+  let brokeAbs = null;
+  let totalWd = 0;
+  const pts = [];
+  let absM = startAbs;
+  const annualInc = () => idx * s.idxInc / 100 + div * s.divInc / 100;
+  pts.push({ absM, cash, idx, div, total: cash + idx + div, annualInc: annualInc(),
+             income: 0, spend: 0, invest: 0, incGen: 0, incPaid: 0, sold: 0 });
+
+  while (absM < endAbs) {
+    const incomeM = amtAtSet(sets.income, absM) / 12;
+    const spendM = amtAtSet(sets.spend, absM) / 12;
+    const investIdxM = amtAtSet(sets.idx, absM) / 12;
+    const investDivM = amtAtSet(sets.divp, absM) / 12;
+    const spot = spotMap[absM] || { idx: 0, div: 0, cash: 0 };
+
+    // 1. 収入・臨時収支
+    let flow = incomeM + spot.cash;
+
+    // 2. インカム（配当・分配金）
+    const dIdx = idx * (s.idxInc / 100 / 12);
+    const dDiv = div * (s.divInc / 100 / 12);
+    const incPaid = (s.idxReinvest ? 0 : dIdx) + (s.divReinvest ? 0 : dDiv);  // 現金で受け取る配当
+    if (s.idxReinvest) idx += dIdx; else flow += dIdx;
+    if (s.divReinvest) div += dDiv; else flow += dDiv;
+
+    // 3. 投資（フェーズ＋スポット）
+    const investIdx = investIdxM + spot.idx;
+    const investDiv = investDivM + spot.div;
+    idx += investIdx;
+    div += investDiv;
+    flow -= investIdx + investDiv;
+
+    // 4. 取り崩し（インデックス → 高配当の順に売却して現金へ）
+    let sold = 0;
+    if (wdMode !== 'none' && absM >= wdStartAbs) {
+      const hold = idx + div;
+      let wd = wdMode === 'fixed' ? Math.min(s.wdAmount / 12, hold) : hold * (s.wdRate / 100 / 12);
+      let need = wd;
+      const fi = Math.min(need, idx); idx -= fi; need -= fi;
+      const fd = Math.min(need, div); div -= fd; need -= fd;
+      wd -= need;
+      flow += wd;
+      sold += wd;
+      totalWd += wd;
+    }
+
+    // 5. 生活費
+    flow -= spendM;
+    const cashBefore = cash;
+    cash += flow;
+
+    // 6. 自動売却: 現金を先に使い、下限を割り込む分はインデックス → 高配当の順に売却して補填
+    //    （現金が既に下限以下の場合は、減らないように不足分だけ売却）
+    const floor = s.cashFloor || 0;
+    if (cash < Math.min(cashBefore, floor)) {
+      const target = Math.min(Math.max(cashBefore, 0), floor);
+      let need = target - cash;
+      const fi = Math.min(need, idx); idx -= fi; need -= fi;
+      const fd = Math.min(need, div); div -= fd; need -= fd;
+      const soldNow = (target - cash) - need;
+      sold += soldNow;
+      cash += soldNow;
+      if (cash < 0 && brokeAbs === null) brokeAbs = absM + 1;
+    }
+
+    // 7. キャピタル成長
+    idx *= (1 + gIdx);
+    div *= (1 + gDiv);
+
+    absM++;
+    pts.push({ absM, cash, idx, div, total: cash + idx + div, annualInc: annualInc(),
+               income: incomeM + Math.max(0, spot.cash), spend: spendM + Math.max(0, -spot.cash),
+               invest: investIdx + investDiv, incGen: dIdx + dDiv, incPaid, sold });
+  }
+
+  let peak = pts[0];
+  for (const p of pts) if (p.total > peak.total) peak = p;
+  const totalSold = pts.reduce((a, p) => a + p.sold, 0);
+
+  return { pts, sets, startAbs, endAbs, brokeAbs, peak, totalWd, totalSold, wdMode, wdStartAbs };
+}
+
+// ---- プラン比較 ----
+function savePlan() {
+  const color = PLAN_COLORS[savedPlans.length % PLAN_COLORS.length];
+  planSeq++;
+  savedPlans.push({ name: `プラン${planSeq}`, color, settings: readSettings() });
+  simulate();
+}
+function removePlan(i) { savedPlans.splice(i, 1); simulate(); }
+function renamePlan(i, name) { savedPlans[i].name = name || savedPlans[i].name; simulate(); }
+
+// 保存プランの設定を現在のプランに反映する
+function applyPlan(i) {
+  const p = savedPlans[i];
+  if (!confirm(`「${p.name}」の設定を現在のプランに反映します。\n現在の編集内容は上書きされます（保存済みプランはそのまま残ります）。よろしいですか？`)) return;
+  const s = p.settings;
+  const map = {
+    birthYear: s.by, birthMonth: s.bm, endAge: s.endAge,
+    startAge: s.startAge, startMonth: s.startMonth,
+    initIdx: s.initIdx, initDiv: s.initDiv, initCash: s.initCash,
+    idxCap: s.idxCap, divCap: s.divCap, divInc: s.divInc,
+    wdAmount: s.wdAmount, wdRate: s.wdRate,
+    wdStartAge: s.wdStartAge, wdStartMonth: s.wdStartMonth, cashFloor: s.cashFloor,
+  };
+  for (const [id, v] of Object.entries(map)) {
+    if (v != null) document.getElementById(id).value = v;
+  }
+  document.getElementById('divIncMode').value = s.divReinvest ? 'reinvest' : 'receive';
+  document.getElementById('wdMode').value = s.wdMode || 'none';
+  phaseSets = {};
+  for (const k of ['income', 'spend', 'idx', 'divp']) {
+    phaseSets[k] = (s.phaseSets && s.phaseSets[k] ? s.phaseSets[k] : []).map(q => ({ ...q }));
+  }
+  spots = (s.spots || []).map(q => ({ ...q }));
+  renderAllPhaseSets();
+  renderSpots();
+  simulate();
+}
+
+function renderPlanArea(planResults, cur) {
+  const el = document.getElementById('planArea');
+  if (!planResults.length) {
+    el.innerHTML = '<p class="note" style="margin-top:0">保存を押すと、そのときの設定一式がプランとして固定されます。フェーズや利回り・取り崩しを変えて保存すると、グラフ（総資産の線）とこの表で比較できます。</p>';
+    return;
+  }
+  const cell = r => `
+    <td>${ymStr(r.peak.absM)}（${ageStr(r.peak.absM)}）</td>
+    <td>${fmt(r.peak.total)}</td>
+    <td>${fmt(r.pts[r.pts.length - 1].total)}</td>
+    <td>${r.brokeAbs !== null ? `<span style="color:var(--red);font-weight:bold">${ymStr(r.brokeAbs)}（${ageStr(r.brokeAbs)}）</span>` : '—'}</td>`;
+  el.innerHTML = `<table>
+    <thead><tr><th>プラン</th><th>資産ピーク時期</th><th>ピーク額</th><th>最終総資産</th><th>資産が尽きる</th><th></th></tr></thead>
+    <tbody>
+      <tr><td><span class="dot" style="background:#1a2433"></span> 現在のプラン</td>${cell(cur)}<td></td></tr>
+      ${planResults.map((p, i) => `<tr>
+        <td><span class="dot" style="background:${p.color}"></span>
+          <input type="text" class="plan-name" value="${p.name.replace(/"/g, '&quot;')}" onchange="renamePlan(${i}, this.value)"></td>
+        ${cell(p.r)}
+        <td style="white-space:nowrap">
+          <button class="plan-apply" onclick="applyPlan(${i})" title="このプランの設定を現在のプランに反映">反映</button><button class="plan-del" onclick="removePlan(${i})" title="削除">✕</button>
+        </td>
+      </tr>`).join('')}
+    </tbody>
+  </table>
+  <p class="note">プラン名はクリックで編集できます。「反映」でそのプランの設定を現在のプランに呼び出せます（保存済みプランは残ります）。グラフには各プランの総資産が線で重なります。</p>`;
+}
+
+// ---- メイン ----
+function simulate() {
+  const curAbs = nowAbs();
+  document.getElementById('ageBadge').textContent = `現在 ${ageStr(curAbs)}（${ymStr(curAbs)}）`;
+  const s = readSettings();
+  document.getElementById('wdFixedRow').style.display = s.wdMode === 'fixed' ? '' : 'none';
+  document.getElementById('wdRateRow').style.display = s.wdMode === 'rate' ? '' : 'none';
+
+  const r = computePlan(s);
+  document.getElementById('startNote').textContent =
+    `→ ${ymStr(r.startAbs)}（${ageStr(r.startAbs)}）から ${ymStr(r.endAbs)}（${s.endAge}歳）までシミュレーション`;
+  document.getElementById('wdNote').textContent = s.wdMode === 'none'
+    ? ''
+    : `→ ${ymStr(r.wdStartAbs)}（${ageStr(r.wdStartAbs)}）から取り崩し開始`;
+
+  updateSetCaptions(r.sets);
+  updateSpotCaptions(r.startAbs, r.endAbs);
+
+  // 使用額の設定がシミュレーション終了より早く途切れている場合は警告
+  const spendSet = r.sets.spend;
+  const spendEnd = spendSet.length ? spendSet[spendSet.length - 1].endAbs : r.startAbs;
+  const spendWarn = document.getElementById('spendGapWarn');
+  if (spendEnd < r.endAbs) {
+    spendWarn.style.display = '';
+    spendWarn.textContent = `⚠ 使用額の設定が ${ymStr(spendEnd)}（${ageStr(spendEnd)}）で終わっています。それ以降の生活費は0円として計算されるため、最後のフェーズを ${Math.floor(r.endAbs / 12)}歳まで延ばすのがおすすめです。`;
+  } else {
+    spendWarn.style.display = 'none';
+  }
+
+  const planResults = savedPlans.map(p => ({ ...p, r: computePlan(p.settings) }));
+
+  renderSummary(r, curAbs);
+  renderPlanArea(planResults, r);
+  drawChart(r, curAbs, planResults);
+  renderTable(r);
+  saveState();
+}
+
+function renderSummary(r, curAbs) {
+  const cards = [];
+  const ptAt = m => r.pts.find(p => p.absM === m);
+
+  // 現在
+  const nowPt = ptAt(curAbs);
+  if (nowPt) {
+    const netY = amtAtSet(r.sets.income, curAbs) - amtAtSet(r.sets.spend, curAbs)
+               - amtAtSet(r.sets.idx, curAbs) - amtAtSet(r.sets.divp, curAbs);
+    cards.push({ absM: curAbs, html: `
+      <div class="tl-card green">
+        <div class="tag">現在の総資産</div>
+        <div class="when">${ymStr(curAbs)}・${ageStr(curAbs)}</div>
+        <div class="big">${fmt(nowPt.total)}</div>
+        <div class="tl-row"><span>📈 インデックス</span><b>${fmt(nowPt.idx)}</b></div>
+        <div class="tl-row"><span>💰 高配当株</span><b>${fmt(nowPt.div)}</b></div>
+        <div class="tl-row"><span>💴 現金</span><b>${fmt(nowPt.cash)}</b></div>
+        <div class="tl-row"><span>年間配当（税引後）</span><b>${fmt(nowPt.annualInc)}</b></div>
+        <div class="tl-row"><span>現金の増減（年）</span><b style="color:${netY < 0 ? 'var(--red)' : 'var(--green)'}">${netY >= 0 ? '+' : ''}${Math.round(netY).toLocaleString()}万円</b></div>
+      </div>` });
+  }
+
+  // 資産ピーク
+  if (r.peak.absM !== r.endAbs && r.peak.absM !== curAbs) {
+    cards.push({ absM: r.peak.absM, html: `
+      <div class="tl-card blue">
+        <div class="tag">資産のピーク</div>
+        <div class="when">${ymStr(r.peak.absM)}・${ageStr(r.peak.absM)}</div>
+        <div class="big">${fmt(r.peak.total)}</div>
+        <div class="tl-row"><span>📈 インデックス</span><b>${fmt(r.peak.idx)}</b></div>
+        <div class="tl-row"><span>💰 高配当株</span><b>${fmt(r.peak.div)}</b></div>
+        <div class="tl-row"><span>💴 現金</span><b>${fmt(r.peak.cash)}</b></div>
+        <div class="tl-row"><span>年間配当（税引後）</span><b>${fmt(r.peak.annualInc)}</b></div>
+      </div>` });
+  }
+
+  // 破綻
+  if (r.brokeAbs !== null) {
+    cards.push({ absM: r.brokeAbs, html: `
+      <div class="tl-card red">
+        <div class="tag">資産が尽きる</div>
+        <div class="when">${ymStr(r.brokeAbs)}・${ageStr(r.brokeAbs)}</div>
+        <div class="big">全資産を使い切ります</div>
+        <div class="tl-row"><span>対策</span><b>使用額・投資額・取り崩し額を見直し</b></div>
+      </div>` });
+  }
+
+  // 最終
+  const last = r.pts[r.pts.length - 1];
+  cards.push({ absM: Infinity, html: `
+    <div class="tl-card orange">
+      <div class="tag">${Math.floor(r.endAbs / 12)}歳時点</div>
+      <div class="when">${ymStr(r.endAbs)}・${ageStr(r.endAbs)}</div>
+      <div class="big">${fmt(last.total)}</div>
+      <div class="tl-row"><span>📈 インデックス</span><b>${fmt(last.idx)}</b></div>
+      <div class="tl-row"><span>💰 高配当株</span><b>${fmt(last.div)}</b></div>
+      <div class="tl-row"><span>💴 現金</span><b>${fmt(last.cash)}</b></div>
+      <div class="tl-row"><span>年間配当（税引後）</span><b>${fmt(last.annualInc)}</b></div>
+      ${r.totalSold > 0.5 ? `<div class="tl-row"><span>売却の累計（取り崩し含む）</span><b>${fmt(r.totalSold)}</b></div>` : ''}
+    </div>` });
+
+  cards.sort((a, b) => a.absM - b.absM);
+  document.getElementById('summary').innerHTML =
+    `<div class="timeline">${cards.map(c => c.html).join('<div class="tl-arrow">➜</div>')}</div>`;
+}
+
+// ---- グラフ ----
+function drawChart(r, curAbs, planResults) {
+  const canvas = document.getElementById('chart');
+  const w = canvas.clientWidth, h = canvas.clientHeight || 400;
+  if (!w) return;
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, w, h);
+
+  const padL = 74, padR = 16, padT = 16, padB = 36;
+  const plotW = w - padL - padR, plotH = h - padT - padB;
+  const minAbs = r.startAbs;
+  const maxAbs = Math.max(r.endAbs, ...planResults.map(p => p.r.endAbs));
+  const span = Math.max(1, maxAbs - minAbs);
+  const clamp0 = v => Math.max(0, v);
+  const maxVal = Math.max(
+    ...r.pts.map(p => clamp0(p.cash) + p.idx + p.div),
+    ...planResults.flatMap(p => p.r.pts.map(q => q.total)),
+  ) * 1.1 || 1;
+
+  const x = absM => padL + ((absM - minAbs) / span) * plotW;
+  const y = v => padT + plotH - (v / maxVal) * plotH;
+
+  ctx.font = '11px sans-serif';
+  ctx.fillStyle = '#6b7a90';
+  ctx.strokeStyle = '#e2e8f0';
+  for (let i = 0; i <= 5; i++) {
+    const v = (maxVal / 5) * i;
+    ctx.beginPath();
+    ctx.moveTo(padL, y(v));
+    ctx.lineTo(w - padR, y(v));
+    ctx.stroke();
+    ctx.textAlign = 'right';
+    ctx.fillText(fmt(v), padL - 6, y(v) + 4);
+  }
+  const spanYears = span / 12;
+  const xStep = spanYears > 40 ? 10 : spanYears > 15 ? 5 : 2;
+  ctx.textAlign = 'center';
+  ctx.fillText(ageStr(minAbs), x(minAbs), h - padB + 18);
+  for (let age = Math.ceil((minAbs / 12) / xStep) * xStep; age * 12 <= maxAbs; age += xStep) {
+    if (age * 12 - minAbs < xStep * 12 * 0.5) continue;
+    ctx.fillText(`${age}歳`, x(age * 12), h - padB + 18);
+  }
+
+  // 積み上げ（下から 現金 → インデックス → 高配当）
+  const layers = [
+    { get: p => clamp0(p.cash), fill: 'rgba(148,163,184,0.45)', stroke: '#94a3b8' },
+    { get: p => p.idx, fill: 'rgba(37,99,235,0.40)', stroke: '#2563eb' },
+    { get: p => p.div, fill: 'rgba(234,88,12,0.40)', stroke: '#ea580c' },
+  ];
+  let below = r.pts.map(() => 0);
+  for (const L of layers) {
+    const tops = r.pts.map((p, i) => below[i] + L.get(p));
+    ctx.beginPath();
+    r.pts.forEach((p, i) => i === 0 ? ctx.moveTo(x(p.absM), y(tops[i])) : ctx.lineTo(x(p.absM), y(tops[i])));
+    for (let i = r.pts.length - 1; i >= 0; i--) ctx.lineTo(x(r.pts[i].absM), y(below[i]));
+    ctx.closePath();
+    ctx.fillStyle = L.fill;
+    ctx.fill();
+    ctx.beginPath();
+    r.pts.forEach((p, i) => i === 0 ? ctx.moveTo(x(p.absM), y(tops[i])) : ctx.lineTo(x(p.absM), y(tops[i])));
+    ctx.strokeStyle = L.stroke;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    below = tops;
+  }
+
+  // 保存プラン（総資産の線）
+  for (const p of planResults) {
+    ctx.beginPath();
+    p.r.pts.forEach((q, i) => i === 0 ? ctx.moveTo(x(q.absM), y(q.total)) : ctx.lineTo(x(q.absM), y(q.total)));
+    ctx.strokeStyle = p.color;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+
+  // フェーズ境界（全セットの境界の和集合）
+  const boundaries = [...new Set(Object.values(r.sets).flatMap(set => set.map(p => p.endAbs)))];
+  for (const b of boundaries) {
+    if (b <= minAbs || b >= maxAbs) continue;
+    ctx.beginPath();
+    ctx.setLineDash([3, 5]);
+    ctx.moveTo(x(b), padT);
+    ctx.lineTo(x(b), padT + plotH);
+    ctx.strokeStyle = '#cbd5e1';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // 取り崩し開始の縦線
+  if (r.wdMode !== 'none' && r.wdStartAbs > minAbs && r.wdStartAbs < maxAbs) {
+    ctx.beginPath();
+    ctx.setLineDash([4, 4]);
+    ctx.moveTo(x(r.wdStartAbs), padT);
+    ctx.lineTo(x(r.wdStartAbs), padT + plotH);
+    ctx.strokeStyle = '#ea580c';
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#ea580c';
+    ctx.textAlign = 'left';
+    ctx.fillText(`取り崩し開始（${ymStr(r.wdStartAbs)}）`, x(r.wdStartAbs) + 5, padT + 26);
+  }
+
+  // 現在の縦線
+  if (curAbs > minAbs && curAbs < maxAbs) {
+    const nx = x(curAbs);
+    ctx.beginPath();
+    ctx.setLineDash([2, 4]);
+    ctx.moveTo(nx, padT);
+    ctx.lineTo(nx, padT + plotH);
+    ctx.strokeStyle = '#059669';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#059669';
+    ctx.textAlign = 'left';
+    ctx.fillText(`現在（${ymStr(curAbs)}）`, nx + 5, padT + 12);
+  }
+
+  const item = (color, label) =>
+    `<span class="item"><span class="dot" style="background:${color}"></span>${label}</span>`;
+  document.getElementById('legend').innerHTML = [
+    item('#94a3b8', '現金'),
+    item('#2563eb', 'インデックス'),
+    item('#ea580c', '高配当株'),
+    ...planResults.map(p => item(p.color, `${p.name}（総資産）`)),
+  ].join('') + '<span class="item" style="color:#cbd5e1">┊ フェーズ境界</span>';
+}
+
+// ---- 年表 ----
+function renderTable(r) {
+  const pts = r.pts;
+  const rows = [];
+  for (let k = 12; k < pts.length; k += 12) rows.push(k);
+  if ((pts.length - 1) % 12 !== 0) rows.push(pts.length - 1);
+
+  const sum = (k, key) => pts.slice(Math.max(1, k - 11), k + 1).reduce((a, p) => a + (p[key] || 0), 0);
+  const money = (v, sign) => Math.abs(v) < 0.5
+    ? '<span style="color:#cbd5e1">—</span>'
+    : `${sign}${fmt(Math.abs(v))}`;
+  const html = rows.map(k => {
+    const d = pts[k];
+    const income = sum(k, 'income'), spend = sum(k, 'spend'), invest = sum(k, 'invest');
+    const incPaid = sum(k, 'incPaid'), sold = sum(k, 'sold');
+    const cashDelta = d.cash - pts[Math.max(0, k - 12)].cash;
+    // この1年に該当するスポット項目のメモ
+    const winStart = pts[Math.max(0, k - 12)].absM;
+    const memos = spots.filter(sp => {
+      const a = absFromAgeCalMonth(sp.age, sp.month);
+      return a >= winStart && a < d.absM && (sp.memo || '').trim();
+    }).map(sp => sp.memo.trim());
+    return `<tr>
+      <td>${ymStr(d.absM)}${memos.length ? `<div style="font-size:10px; color:var(--accent); line-height:1.3">📌 ${memos.join('、')}</div>` : ''}</td>
+      <td>${ageStr(d.absM)}</td>
+      <td class="sep-l">${money(income, '+')}</td>
+      <td>${money(spend, '−')}</td>
+      <td>${money(invest, '−')}</td>
+      <td>${money(incPaid, '+')}</td>
+      <td>${money(sold, '+')}</td>
+      <td class="${cashDelta < -0.5 ? 'neg' : ''}" style="font-weight:600">${cashDelta >= 0 ? '+' : ''}${fmt(cashDelta)}</td>
+      <td class="sep-l ${d.cash < 0 ? 'neg' : ''}">${fmt(d.cash)}</td>
+      <td>${fmt(d.idx)}</td>
+      <td>${fmt(d.div)}</td>
+      <td class="total">${fmt(d.total)}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('table').innerHTML = `
+    <thead>
+      <tr class="grp-row">
+        <th colspan="2"></th>
+        <th colspan="6" class="sep-l">1年間の現金の流れ（万円）</th>
+        <th colspan="4" class="sep-l">資産残高（各時点）</th>
+      </tr>
+      <tr>
+        <th>年月</th><th>年齢</th>
+        <th class="sep-l">手取り</th><th>使用額</th><th>投資へ</th>
+        <th title="現金として受け取った配当・分配金。再投資分は含まず、資産残高の増加に反映されます"><span class="dot" style="background:#ea580c"></span> 受取配当</th>
+        <th title="定額・定率の取り崩しと、現金下限を守るための自動売却の合計">売却</th>
+        <th>現金増減</th>
+        <th class="sep-l"><span class="dot" style="background:#94a3b8"></span> 現金</th>
+        <th><span class="dot" style="background:#2563eb"></span> インデックス</th>
+        <th><span class="dot" style="background:#ea580c"></span> 高配当</th>
+        <th>総資産</th>
+      </tr>
+    </thead>
+    <tbody>${html}</tbody>`;
+}
+
+// 入力変更で再計算
+document.querySelectorAll('input, select').forEach(el => el.addEventListener('change', simulate));
+window.addEventListener('resize', () => simulate());
+
+loadState();
+applyTab();
+showIntroIfNeeded();
+renderAllPhaseSets();
+renderSpots();
+simulate();
+</script>
+</body>
+</html>
