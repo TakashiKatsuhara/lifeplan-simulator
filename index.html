@@ -184,8 +184,8 @@
     font-size: 12px;
   }
   .intro-banner .close:hover { color: var(--text); }
-  .timeline { display: flex; gap: 8px; align-items: stretch; }
-  .tl-card { flex: 1; min-width: 0; padding: 16px; border-radius: 14px; border: 1px solid rgba(15,23,42,.06); background: #fff; }
+  .timeline { display: flex; gap: 8px; align-items: stretch; flex-wrap: wrap; }
+  .tl-card { flex: 1 1 215px; min-width: 0; padding: 16px; border-radius: 14px; border: 1px solid rgba(15,23,42,.06); background: #fff; }
   .tl-card .tag { display: inline-block; font-size: 10.5px; font-weight: 700; padding: 2px 10px; border-radius: 999px; margin-bottom: 6px; }
   .tl-card .when { font-size: 11.5px; color: var(--sub); }
   .tl-card .big { font-size: 22px; font-weight: 800; margin: 2px 0 10px; letter-spacing: .01em; font-variant-numeric: tabular-nums; }
@@ -196,7 +196,7 @@
   .tl-card.red .tag { background: #fee2e2; color: var(--red); }
   .tl-card.red .big { color: var(--red); }
   .tl-row { display: flex; justify-content: space-between; gap: 8px; font-size: 11.5px; color: var(--sub); border-top: 1px solid var(--line); padding: 4px 0; }
-  .tl-row b { color: var(--text); font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .tl-row b { color: var(--text); font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
   .tl-arrow { align-self: center; color: #d3dae3; font-size: 15px; flex: 0 0 auto; }
   canvas { width: 100%; height: 400px; display: block; }
   .legend { display: flex; gap: 8px; font-size: 11.5px; color: var(--sub); margin-top: 10px; flex-wrap: wrap; }
@@ -231,7 +231,7 @@
   }
   .plan-apply:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
   #planArea { overflow-x: auto; }
-  @media (max-width: 980px) {
+  @media (max-width: 1080px) {
     .layout, .layout.setup { grid-template-columns: 1fr; }
     .timeline { flex-direction: column; }
     .tl-arrow { transform: rotate(90deg); text-align: center; }
