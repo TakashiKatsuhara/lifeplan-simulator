@@ -2,7 +2,7 @@
 
 手取り収入・生活費・インデックス投資・高配当株投資を年齢や時期ごとに設定して、生涯の資産推移を**月単位**でシミュレーションできる無料ツールです。
 
-**▶ 使ってみる: https://takashikatsuhara.github.io/lifeplan-simulator/**
+**▶ 使ってみる: https://katsuo-labs.github.io/lifeplan-simulator/**
 
 ## 特徴
 
