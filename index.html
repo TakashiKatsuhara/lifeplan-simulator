@@ -37,15 +37,19 @@
   .subtitle { color: var(--sub); font-size: 13px; margin-bottom: 20px; }
   .page-head {
     max-width: 1360px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 12px;
+    margin: 0 auto 18px;
+    background: linear-gradient(135deg, #1e3a8a, #2563eb);
+    border-radius: 14px;
+    padding: 18px 24px;
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
   }
+  .page-head h1 { color: #fff; }
+  .page-head .subtitle { color: rgba(255, 255, 255, 0.88); margin-bottom: 0; }
+  .page-head .age-badge { background: rgba(255, 255, 255, 0.22); color: #fff; }
   @media (max-width: 700px) {
     body { padding: 12px; }
-    .page-head { flex-direction: column; }
+    .page-head { padding: 14px 16px; border-radius: 12px; }
     h1 { font-size: 19px; }
   }
   .layout {
@@ -125,7 +129,12 @@
   }
   input:focus, select:focus { outline: 2px solid var(--accent-light); border-color: var(--accent); }
   .row { display: flex; gap: 10px; margin-bottom: 12px; }
-  .row > div { flex: 1; }
+  .row > div {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;   /* ラベルが2行になっても入力欄は下端で横並びに揃える */
+  }
   .age-badge {
     display: inline-block;
     background: var(--accent-light);
@@ -153,6 +162,11 @@
     min-width: 16px;
   }
   .phase .phase-inputs > div { flex: 1; min-width: 0; }
+  .phase .phase-inputs > div:not(.kind-btns) {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;   /* ラベルの行数に関わらず入力欄を下端で揃える */
+  }
   .phase button {
     background: none;
     border: none;
@@ -165,8 +179,7 @@
   .phase .caption .warn { color: var(--red); }
   .kind-btns { display: flex; gap: 4px; flex-wrap: wrap; flex: 1; }
   .kind-btn {
-    flex: 1;
-    min-width: 86px;
+    flex: 1 1 40%;   /* 常に2列×2行のグリッドに */
     padding: 5px 4px;
     font-size: 11px;
     border: 1px solid var(--border);
