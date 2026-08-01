@@ -308,11 +308,6 @@
     <h1>🗺 ライフプラン・シミュレーター<span class="age-badge" id="ageBadge"></span></h1>
     <p class="subtitle">「何歳までにいくら貯めて、いくら使うか」を設計します（金額はすべて万円、収支は年額で入力）。<br>手取り・使用額・投資はそれぞれ独立したタイミングで区切れます。設定と保存プランはこのブラウザに自動保存されます。</p>
   </div>
-  <div style="display:flex; gap:6px;">
-    <button class="btn-reset" onclick="exportState()" title="設定とプランをJSONファイルに書き出して保存">💾 バックアップ</button>
-    <button class="btn-reset" onclick="importState()" title="バックアップしたJSONファイルから復元">📂 復元</button>
-    <button class="btn-reset" onclick="resetAll()" title="保存された設定とプランを消去して初期状態に戻す">🗑 リセット</button>
-  </div>
 </div>
 
 <div class="intro-banner" id="introBanner" style="display:none">
@@ -534,7 +529,12 @@
     <h2>このツールについて</h2>
     <p>ライフプラン・シミュレーターは、手取り収入・生活費・インデックス投資・高配当株投資を年齢や時期ごとに自由に設定し、生涯の資産推移を<b>月単位</b>で計算できる無料ツールです。積立シミュレーションだけでなく、老後の取り崩し（定額・定率・自動売却）、配当金・分配金の再投資／受け取り、現金とのバランスまでまとめて確認でき、「何歳までにいくら貯まるか」「資産は何歳まで持つか」をグラフと年表で把握できます。</p>
     <h2 style="margin-top:18px">データの取り扱い</h2>
-    <p>入力されたデータは、お使いのブラウザ内（localStorage）にのみ保存されます。<b>サーバーへの送信・収集は一切行いません</b>。ブラウザのサイトデータを削除すると保存された設定・プランも消去されるため、画面右上の「💾 バックアップ」で設定一式をJSONファイルとして書き出しておくことをおすすめします（「📂 復元」でいつでも読み込めます）。</p>
+    <p>入力されたデータは、お使いのブラウザ内（localStorage）にのみ保存されます。<b>サーバーへの送信・収集は一切行いません</b>。ブラウザのサイトデータを削除すると保存された設定・プランも消去されるため、「バックアップ」で設定一式をJSONファイルとして書き出しておくことをおすすめします（「復元」でいつでも読み込めます）。</p>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;">
+      <button class="btn-reset" onclick="exportState()" title="設定とプランをJSONファイルに書き出して保存">💾 バックアップ</button>
+      <button class="btn-reset" onclick="importState()" title="バックアップしたJSONファイルから復元">📂 復元</button>
+      <button class="btn-reset" onclick="resetAll()" title="保存された設定とプランを消去して初期状態に戻す">🗑 リセット</button>
+    </div>
     <h2 style="margin-top:18px">免責事項</h2>
     <p>本ツールは、シミュレーションによる情報提供のみを目的としており、特定の金融商品の推奨・勧誘や投資助言を行うものではありません。計算は簡易的なモデル（月次複利、税金・手数料は未考慮）に基づくものであり、実際の運用成果や将来の資産額を保証するものではありません。本ツールの利用により生じたいかなる損害についても、制作者は一切の責任を負いません。投資に関する最終的な判断は、ご自身の責任において行ってください。</p>
   </div>
